@@ -48,7 +48,8 @@ class PdfBookAction extends Action {
 		$nothumbs  = $this->setProperty( 'nothumbs', '', '' );
 		$notitle   = $this->setProperty( 'notitle', '', '' );
 		$layout    = $format == 'single' ? '--webpage' : '--firstpage toc';
-		$charset   = $this->setProperty( 'Charset',     'iso-8859-1' );
+		// problème des apostrophes courbes
+		$charset   = $this->setProperty( 'Charset',     'utf-8' );
 		$left      = $this->setProperty( 'LeftMargin',  '1cm' );
 		$right     = $this->setProperty( 'RightMargin', '1cm' );
 		$top       = $this->setProperty( 'TopMargin',   '1cm' );
@@ -83,13 +84,13 @@ class PdfBookAction extends Action {
 				$cat    = $db->addQuotes( $title->getDBkey() );
 				$result = $db->select(
 					'categorylinks',
-					'cl_from',
+					'cl_sortkey',
 					"cl_to = $cat",
 					'PdfBook',
 					[ 'ORDER BY' => 'cl_sortkey' ]
 				);
 				while ( $row = $result->fetchRow() ) {
-					$articles[] = Title::newFromID( $row[0] );
+					$articles[] = Title::newFromText( $row[0] );
 				}
 			} else {
 				$text = $page->getContent()->getNativeData();
